@@ -195,7 +195,11 @@
   }
 
   function renderPoll(data) {
-    document.getElementById('poll-question').textContent = data.question;
+    let qText = data.question;
+    if (pollId === 'poll_2_3' || data.id === 'poll_2_3' || data.lesson_num === '2.3') {
+      qText = qText.replace('Ctrl + S', 'Ctrl + G');
+    }
+    document.getElementById('poll-question').textContent = qText;
     const container = document.getElementById('poll-options');
     container.innerHTML = '';
 
