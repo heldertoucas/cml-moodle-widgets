@@ -242,7 +242,7 @@
 
   async function fetchStats() {
     try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/moodle_poll_submissions?poll_id=eq.${encodeURIComponent(pollId)}&select=option_id`, {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/moodle_poll_votes?poll_id=eq.${encodeURIComponent(pollId)}&select=option_id`, {
         headers: {
           'apikey': ANON_KEY,
           'Authorization': `Bearer ${ANON_KEY}`
