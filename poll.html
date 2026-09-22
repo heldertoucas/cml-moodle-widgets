@@ -154,13 +154,26 @@
 
   async function fetchPoll() {
     try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/moodle_polls?poll_id=eq.${encodeURIComponent(pollId)}`, {
+      // Tentar por id ou por lesson_num
+      let res = await fetch(`${SUPABASE_URL}/rest/v1/moodle_polls?id=eq.${encodeURIComponent(pollId)}`, {
         headers: {
           'apikey': ANON_KEY,
           'Authorization': `Bearer ${ANON_KEY}`
         }
       });
-      const data = await res.json();
+      let data = await res.json();
+      if (!data || data.length === 0) {
+        // Tentar por lesson_num
+        const cleanLesson = pollId.replace('poll_', '').replace('_', '.');
+        res = await fetch(`${SUPABASE_URL}/rest/v1/moodle_polls?lesson_num=eq.${encodeURIComponent(cleanLesson)}`, {
+          headers: {
+            'apikey': ANON_KEY,
+            'Authorization': `Bearer ${ANON_KEY}`
+          }
+        });
+        data = await res.json();
+      }
+
       if (data && data.length > 0) {
         pollData = data[0];
         renderPoll(pollData);
