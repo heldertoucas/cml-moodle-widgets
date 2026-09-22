@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sondagem Interativa CML</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: transparent;
+      color: #1e293b;
+      padding: 6px 2px;
+      overflow-x: hidden;
+    }
+    .poll-card {
+      background: #fffdf5;
+      border: 1px solid #fde68a;
+      border-radius: 12px;
+      padding: 16px 18px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+    }
+    .poll-title {
+      font-size: 16.5px;
+      font-weight: 700;
+      color: #0f172a;
+      line-height: 1.45;
+      margin-bottom: 14px;
+    }
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+    .opt-btn {
+      position: relative;
+      width: 100%;
+      text-align: left;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 9px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      font-size: 13.5px;
+      color: #1e293b;
+      font-family: inherit;
+      overflow: hidden;
+      transition: all 0.15s ease;
+      user-select: none;
+      min-height: 44px;
+    }
+    .opt-btn:hover:not(.voted) {
+      background: #f8fafc;
+      border-color: #94a3b8;
+    }
+    .opt-btn.voted {
+      cursor: default;
+    }
+    .opt-btn.selected {
+      border-color: #d97706;
+      box-shadow: 0 0 0 1.5px #d97706;
+    }
+    .opt-badge {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: #fef3c7;
+      color: #92400e;
+      font-weight: 700;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+    }
+    .opt-text {
+      flex: 1;
+      line-height: 1.4;
+      z-index: 2;
+    }
+    .opt-pct {
+      flex-shrink: 0;
+      font-weight: 700;
+      font-size: 13px;
+      color: #b45309;
+      display: none;
+      z-index: 2;
+    }
+    .bar-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 0%;
+      background: #fef3c7;
+      z-index: 1;
+      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .opt-btn.selected .bar-fill {
+      background: #fde68a;
+    }
+    .footer-msg {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #64748b;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #64748b;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="poll-card" id="poll-container">
+  <div class="loading" id="loading-state">A carregar sondagem...</div>
+  <div id="content-state" style="display:none;">
+    <h3 class="poll-title" id="poll-question"></h3>
+    <div class="options-list" id="poll-options"></div>
+    <div class="footer-msg">
+      <span id="votes-count"></span>
+      <span id="vote-feedback" style="display:none; font-weight:600; color:#15803d;">✓ Resposta registada</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  const SUPABASE_URL = "https://afjxpcooemugajghvhlr.supabase.co";
+  const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFmanhwY29vZW11Z2FqZ2h2aGxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwODA3MzIsImV4cCI6MjEwNTY1NjczMn0.yYbcBF_6fSpO3wLGp73ckjGb2LzNM1jgr3rmEpoWlbE";
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const pollId = urlParams.get('id') || 'poll_1_1';
+  let pollData = null;
+  let hasVoted = false;
+
+  // Fingerprint simples persistente
+  function getFingerprint() {
+    let fp = localStorage.getItem('cml_poll_fp');
+    if (!fp) {
+      fp = 'fp_' + Math.random().toString(36).substring(2, 15) + '_' + Date.now();
+      localStorage.setItem('cml_poll_fp', fp);
+    }
+    return fp;
+  }
+
+  async function fetchPoll() {
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/moodle_polls?poll_id=eq.${encodeURIComponent(pollId)}`, {
+        headers: {
+          'apikey': ANON_KEY,
+          'Authorization': `Bearer ${ANON_KEY}`
+        }
+      });
+      const data = await res.json();
+      if (data && data.length > 0) {
+        pollData = data[0];
+        renderPoll(pollData);
+      } else {
+        document.getElementById('loading-state').textContent = 'Sondagem não encontrada.';
+      }
+    } catch (err) {
+      console.error(err);
+      document.getElementById('loading-state').textContent = 'Erro ao carregar a sondagem.';
+    }
+  }
+
+  function renderPoll(data) {
+    document.getElementById('poll-question').textContent = data.question;
+    const container = document.getElementById('poll-options');
+    container.innerHTML = '';
+
+    const votedOption = localStorage.getItem(`voted_${pollId}`);
+
+    data.options.forEach(opt => {
+      const btn = document.createElement('div');
+      btn.className = 'opt-btn';
+      btn.id = `opt-${opt.id}`;
+      btn.innerHTML = `
+        <div class="bar-fill" id="bar-${opt.id}"></div>
+        <span class="opt-badge">${opt.id}</span>
+        <span class="opt-text">${opt.text}</span>
+        <span class="opt-pct" id="pct-${opt.id}">0%</span>
+      `;
+      btn.onclick = () => castVote(opt.id);
+      container.appendChild(btn);
+    });
+
+    document.getElementById('loading-state').style.display = 'none';
+    document.getElementById('content-state').style.display = 'block';
+
+    if (votedOption) {
+      hasVoted = true;
+      highlightVoted(votedOption);
+      fetchStats();
+    }
+  }
+
+  async function castVote(optionId) {
+    if (hasVoted) return;
+    hasVoted = true;
+    localStorage.setItem(`voted_${pollId}`, optionId);
+    highlightVoted(optionId);
+
+    try {
+      const resp = await fetch(`${SUPABASE_URL}/rest/v1/rpc/submit_poll_vote`, {
+        method: 'POST',
+        headers: {
+          'apikey': ANON_KEY,
+          'Authorization': `Bearer ${ANON_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          p_poll_id: pollId,
+          p_option_id: optionId,
+          p_fingerprint: getFingerprint()
+        })
+      });
+      const stats = await resp.json();
+      applyStats(stats);
+      document.getElementById('vote-feedback').style.display = 'inline';
+    } catch (e) {
+      console.error('Erro ao registar voto:', e);
+      fetchStats();
+    }
+  }
+
+  function highlightVoted(optionId) {
+    document.querySelectorAll('.opt-btn').forEach(b => b.classList.add('voted'));
+    const selectedBtn = document.getElementById(`opt-${optionId}`);
+    if (selectedBtn) selectedBtn.classList.add('selected');
+    document.querySelectorAll('.opt-pct').forEach(p => p.style.display = 'inline');
+  }
+
+  async function fetchStats() {
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/moodle_poll_submissions?poll_id=eq.${encodeURIComponent(pollId)}&select=option_id`, {
+        headers: {
+          'apikey': ANON_KEY,
+          'Authorization': `Bearer ${ANON_KEY}`
+        }
+      });
+      const votes = await res.json();
+      if (Array.isArray(votes)) {
+        const counts = {};
+        votes.forEach(v => counts[v.option_id] = (counts[v.option_id] || 0) + 1);
+        applyStats({ total_votes: votes.length, breakdown: counts });
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  function applyStats(stats) {
+    const total = stats.total_votes || 0;
+    const breakdown = stats.breakdown || {};
+    document.getElementById('votes-count').textContent = `${total} ${total === 1 ? 'resposta' : 'respostas'} da equipa municipal`;
+
+    pollData.options.forEach(opt => {
+      const count = breakdown[opt.id] || 0;
+      const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+      const bar = document.getElementById(`bar-${opt.id}`);
+      const pctEl = document.getElementById(`pct-${opt.id}`);
+      if (bar) bar.style.width = `${pct}%`;
+      if (pctEl) {
+        pctEl.textContent = `${pct}%`;
+        pctEl.style.display = 'inline';
+      }
+    });
+  }
+
+  fetchPoll();
+</script>
+
+</body>
+</html>

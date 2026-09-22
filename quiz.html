@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Interativo CML</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: transparent;
+      color: #1e293b;
+      padding: 6px 2px;
+      overflow-x: hidden;
+    }
+    .quiz-card {
+      background: #faf5ff;
+      border: 1px solid #d8b4fe;
+      border-radius: 12px;
+      padding: 16px 18px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+    }
+    .quiz-title {
+      font-size: 16.5px;
+      font-weight: 700;
+      color: #0f172a;
+      line-height: 1.45;
+      margin-bottom: 14px;
+    }
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+    .opt-btn {
+      position: relative;
+      width: 100%;
+      text-align: left;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 9px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      font-size: 13.5px;
+      color: #1e293b;
+      font-family: inherit;
+      transition: all 0.15s ease;
+      user-select: none;
+      min-height: 44px;
+    }
+    .opt-btn:hover:not(.answered) {
+      background: #f8fafc;
+      border-color: #94a3b8;
+    }
+    .opt-badge {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: #f3e8ff;
+      color: #7e22ce;
+      font-weight: 700;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .opt-text {
+      flex: 1;
+      line-height: 1.4;
+    }
+    .opt-btn.correct {
+      background: #f0fdf4 !important;
+      border-color: #22c55e !important;
+      color: #15803d;
+    }
+    .opt-btn.correct .opt-badge {
+      background: #dcfce7;
+      color: #166534;
+    }
+    .opt-btn.wrong {
+      background: #fef2f2 !important;
+      border-color: #ef4444 !important;
+      color: #b91c1c;
+    }
+    .opt-btn.wrong .opt-badge {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    .explanation-box {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 9px;
+      font-size: 13.5px;
+      line-height: 1.5;
+      display: none;
+    }
+    .explanation-box.correct {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      color: #166534;
+    }
+    .explanation-box.wrong {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      color: #92400e;
+    }
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #64748b;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="quiz-card" id="quiz-container">
+  <div class="loading" id="loading-state">A carregar check de conhecimento...</div>
+  <div id="content-state" style="display:none;">
+    <h3 class="quiz-title" id="quiz-question"></h3>
+    <div class="options-list" id="quiz-options"></div>
+    <div class="explanation-box" id="explanation"></div>
+  </div>
+</div>
+
+<script>
+  const SUPABASE_URL = "https://afjxpcooemugajghvhlr.supabase.co";
+  const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFmanhwY29vZW11Z2FqZ2h2aGxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwODA3MzIsImV4cCI6MjEwNTY1NjczMn0.yYbcBF_6fSpO3wLGp73ckjGb2LzNM1jgr3rmEpoWlbE";
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const lessonNum = urlParams.get('id') || '1.1';
+  let quizData = null;
+  let hasAnswered = false;
+
+  function getFingerprint() {
+    let fp = localStorage.getItem('cml_quiz_fp');
+    if (!fp) {
+      fp = 'fp_' + Math.random().toString(36).substring(2, 15) + '_' + Date.now();
+      localStorage.setItem('cml_quiz_fp', fp);
+    }
+    return fp;
+  }
+
+  async function fetchQuiz() {
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/moodle_quizzes?lesson_num=eq.${encodeURIComponent(lessonNum)}`, {
+        headers: {
+          'apikey': ANON_KEY,
+          'Authorization': `Bearer ${ANON_KEY}`
+        }
+      });
+      const data = await res.json();
+      if (data && data.length > 0) {
+        quizData = data[0];
+        renderQuiz(quizData);
+      } else {
+        document.getElementById('loading-state').textContent = 'Quiz não encontrado.';
+      }
+    } catch (err) {
+      console.error(err);
+      document.getElementById('loading-state').textContent = 'Erro ao carregar o quiz.';
+    }
+  }
+
+  function renderQuiz(data) {
+    document.getElementById('quiz-question').textContent = data.question;
+    const container = document.getElementById('quiz-options');
+    container.innerHTML = '';
+
+    const letters = ["A", "B", "C", "D"];
+    data.options.forEach((optText, idx) => {
+      const btn = document.createElement('div');
+      btn.className = 'opt-btn';
+      btn.id = `opt-${idx}`;
+      btn.innerHTML = `
+        <span class="opt-badge">${letters[idx]}</span>
+        <span class="opt-text">${optText}</span>
+      `;
+      btn.onclick = () => submitAnswer(idx);
+      container.appendChild(btn);
+    });
+
+    document.getElementById('loading-state').style.display = 'none';
+    document.getElementById('content-state').style.display = 'block';
+
+    const savedAnswer = localStorage.getItem(`quiz_ans_${lessonNum}`);
+    if (savedAnswer !== null) {
+      revealAnswer(parseInt(savedAnswer, 10));
+    }
+  }
+
+  async function submitAnswer(selectedIndex) {
+    if (hasAnswered) return;
+    hasAnswered = true;
+    localStorage.setItem(`quiz_ans_${lessonNum}`, selectedIndex);
+    const isCorrect = (selectedIndex === quizData.correct_index);
+
+    revealAnswer(selectedIndex);
+
+    // Enviar dados em background para o Supabase
+    try {
+      await fetch(`${SUPABASE_URL}/rest/v1/rpc/submit_quiz_answer`, {
+        method: 'POST',
+        headers: {
+          'apikey': ANON_KEY,
+          'Authorization': `Bearer ${ANON_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          p_lesson_num: lessonNum,
+          p_question: quizData.question,
+          p_selected_option: selectedIndex,
+          p_is_correct: isCorrect,
+          p_fingerprint: getFingerprint()
+        })
+      });
+    } catch (e) {
+      console.error('Erro ao registar resposta do quiz no Supabase:', e);
+    }
+  }
+
+  function revealAnswer(selectedIndex) {
+    hasAnswered = true;
+    const isCorrect = (selectedIndex === quizData.correct_index);
+    document.querySelectorAll('.opt-btn').forEach(b => b.classList.add('answered'));
+
+    const chosenBtn = document.getElementById(`opt-${selectedIndex}`);
+    const correctBtn = document.getElementById(`opt-${quizData.correct_index}`);
+
+    if (isCorrect) {
+      if (chosenBtn) chosenBtn.classList.add('correct');
+    } else {
+      if (chosenBtn) chosenBtn.classList.add('wrong');
+      if (correctBtn) correctBtn.classList.add('correct');
+    }
+
+    const expEl = document.getElementById('explanation');
+    expEl.className = 'explanation-box ' + (isCorrect ? 'correct' : 'wrong');
+    expEl.innerHTML = `
+      <strong>${isCorrect ? '✅ Resposta Correta!' : '💡 Resposta Incorreta'}</strong><br>
+      ${quizData.explanation}
+    `;
+    expEl.style.display = 'block';
+  }
+
+  fetchQuiz();
+</script>
+
+</body>
+</html>
