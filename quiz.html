@@ -134,7 +134,10 @@
 <div class="quiz-card" id="quiz-container">
   <div class="loading" id="loading-state">A carregar check de conhecimento...</div>
   <div id="content-state" style="display:none;">
-    <h3 class="quiz-title" id="quiz-question"></h3>
+    <h3 class="quiz-title" id="quiz-question-header" style="display: flex; align-items: center; gap: 8px;">
+      <span style="color:#7e22ce; font-size:20px; display:inline-block;" aria-hidden="true">&#129504;</span>
+      <span id="quiz-question"></span>
+    </h3>
     <div class="options-list" id="quiz-options"></div>
     <div class="footer-msg">
       <span>Não conta para a avaliação</span>

@@ -133,7 +133,10 @@
 <div class="poll-card" id="poll-container">
   <div class="loading" id="loading-state">A carregar sondagem...</div>
   <div id="content-state" style="display:none;">
-    <h3 class="poll-title" id="poll-question"></h3>
+    <h3 class="poll-title" id="poll-question-header" style="display: flex; align-items: center; gap: 8px;">
+      <span style="color:#0d9488; font-size:20px; display:inline-block;" aria-hidden="true">&#128504;</span>
+      <span id="poll-question"></span>
+    </h3>
     <div class="options-list" id="poll-options"></div>
     <div class="footer-msg">
       <span id="votes-count"></span>
