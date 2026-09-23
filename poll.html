@@ -288,7 +288,7 @@
   function applyStats(stats) {
     const total = stats.total_votes || 0;
     const breakdown = stats.breakdown || {};
-    document.getElementById('votes-count').textContent = `${total} ${total === 1 ? 'resposta' : 'respostas'} da equipa municipal`;
+    document.getElementById('votes-count').textContent = `${total} ${total === 1 ? 'resposta' : 'respostas'}`;
 
     pollData.options.forEach(opt => {
       const count = breakdown[opt.id] || 0;
