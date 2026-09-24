@@ -6,174 +6,138 @@
     <title>Moderação de Fóruns — Futuro Digital CML</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #1670cc;
-            --primary-hover: #12569e;
-            --primary-soft: #eff6ff;
-            --success: #059669;
-            --success-soft: #ecfdf5;
-            --danger: #dc2626;
-            --danger-soft: #fef2f2;
-            --warning: #d97706;
-            --warning-soft: #fffbeb;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
-            --bg: #f8fafc;
+            --primary: #1e40af;
+            --primary-hover: #1e3a8a;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --text-sub: #9ca3af;
+            --border: #e5e7eb;
+            --border-subtle: #f3f4f6;
+            --bg: #fafafa;
             --card-bg: #ffffff;
+            --success: #16a34a;
+            --danger: #dc2626;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Plus Jakarta Sans", sans-serif; }
-        body { background: var(--bg); color: var(--text-main); padding-bottom: 85px; font-size: 13px; -webkit-font-smoothing: antialiased; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif; }
+        body { background: var(--bg); color: var(--text-main); padding-bottom: 70px; font-size: 13px; -webkit-font-smoothing: antialiased; }
 
-        /* Header */
+        /* Barra Superior Minimalista */
         header {
             position: sticky; top: 0; z-index: 50;
             background: #ffffff; border-bottom: 1px solid var(--border);
             padding: 10px 24px; display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
         }
-        .header-left { display: flex; align-items: center; gap: 12px; }
-        .cml-badge { background: var(--primary); color: #fff; padding: 3px 8px; border-radius: 6px; font-weight: 700; font-size: 11px; letter-spacing: 0.5px; }
-        .header-title { font-size: 15px; font-weight: 700; color: var(--text-main); }
-        .header-subtitle { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+        .header-left { display: flex; align-items: baseline; gap: 8px; }
+        .header-title { font-size: 14px; font-weight: 700; color: var(--text-main); }
+        .header-subtitle { font-size: 12px; color: var(--text-muted); }
 
-        .header-right { display: flex; align-items: center; gap: 12px; }
-        .header-stats { display: flex; gap: 6px; align-items: center; font-size: 11.5px; font-weight: 600; }
-        .stat { padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 4px; }
-        .stat-tot { background: #f1f5f9; color: var(--text-muted); }
-        .stat-pen { background: var(--warning-soft); color: var(--warning); border: 1px solid #fde68a; }
-        .stat-app { background: var(--success-soft); color: var(--success); border: 1px solid #a7f3d0; }
+        .header-right { display: flex; align-items: center; gap: 14px; }
+        .header-stats { font-size: 12px; font-weight: 600; color: var(--text-muted); }
 
-        /* User Profile Pill */
-        .user-pill {
-            display: flex; align-items: center; gap: 6px;
-            background: #f1f5f9; border: 1px solid var(--border);
-            padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;
-        }
+        .user-select-wrap { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-muted); }
         .user-select {
-            border: none; background: transparent; font-size: 12px; font-weight: 700;
-            color: var(--primary); cursor: pointer; outline: none;
+            border: 1px solid var(--border); background: #ffffff; font-size: 12px; font-weight: 600;
+            color: var(--text-main); border-radius: 6px; padding: 3px 6px; outline: none; cursor: pointer;
         }
 
-        /* Toolbar */
+        /* Toolbar Discreta */
         .toolbar {
-            max-width: 1600px; margin: 14px auto; padding: 0 20px;
-            display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+            max-width: 1560px; margin: 12px auto; padding: 0 16px;
+            display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;
         }
         .filter-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-        .search-bar { width: 260px; padding: 7px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 12.5px; outline: none; background: #fff; }
-        .search-bar:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(22,112,204,0.1); }
-        .select-filter { padding: 7px 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 12.5px; outline: none; background: #fff; color: var(--text-main); cursor: pointer; }
+        .search-bar { width: 240px; padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 12.5px; outline: none; background: #fff; }
+        .search-bar:focus { border-color: var(--primary); }
+        .select-filter { padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 12px; outline: none; background: #fff; color: var(--text-main); cursor: pointer; }
 
-        .btn-group { display: flex; gap: 8px; align-items: center; }
-        button { cursor: pointer; border: none; border-radius: 8px; font-weight: 600; font-size: 12px; padding: 7px 14px; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
-        .btn-ghost { background: #fff; border: 1px solid var(--border); color: var(--text-main); }
-        .btn-ghost:hover { background: #f1f5f9; border-color: #cbd5e1; }
-        .btn-primary { background: var(--primary); color: #fff; }
-        .btn-primary:hover { background: var(--primary-hover); }
-        .btn-success { background: var(--success); color: #fff; }
-        .btn-success:hover { background: #047857; }
-        .btn-github { background: #24292f; color: #fff; }
-        .btn-github:hover { background: #1b1f23; }
+        .btn-group { display: flex; gap: 6px; align-items: center; }
+        button { cursor: pointer; border: none; border-radius: 6px; font-size: 12px; transition: all 0.1s; display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
+        
+        /* Botões secundários: neutros e com ícones */
+        .btn-icon { background: #fff; border: 1px solid var(--border); color: var(--text-main); padding: 6px 10px; font-size: 13px; }
+        .btn-icon:hover { background: #f3f4f6; }
+        
+        /* Botão principal */
+        .btn-main { background: var(--primary); color: #fff; font-weight: 600; padding: 6px 14px; }
+        .btn-main:hover { background: var(--primary-hover); }
 
-        /* Table Grid */
-        .table-container { max-width: 1600px; margin: 0 auto; padding: 0 20px; }
+        /* Tabela / Lista Minimalista */
+        .table-container { max-width: 1560px; margin: 0 auto; padding: 0 16px; }
         .table-header {
             display: grid;
-            grid-template-columns: 200px 1.1fr 1.6fr 90px;
-            gap: 16px; padding: 8px 16px;
-            font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
-            color: var(--text-muted);
+            grid-template-columns: 220px 1fr 1.5fr 70px;
+            gap: 16px; padding: 8px 12px;
+            font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px;
+            color: var(--text-sub);
         }
 
         .row-item {
             background: var(--card-bg);
             border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 12px 16px;
-            margin-bottom: 10px;
+            border-radius: 6px;
+            padding: 10px 14px;
+            margin-bottom: 8px;
             display: grid;
-            grid-template-columns: 200px 1.1fr 1.6fr 90px;
+            grid-template-columns: 220px 1fr 1.5fr 70px;
             gap: 16px;
             align-items: start;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
-            transition: all 0.15s;
-            border-left: 4px solid #cbd5e1;
+            transition: border-color 0.1s;
         }
-        .row-item:hover { box-shadow: 0 3px 10px rgba(0,0,0,0.04); border-color: #cbd5e1; }
-        .row-item.status-app { border-left-color: var(--success); }
-        .row-item.status-pen { border-left-color: var(--warning); }
-        .row-item.status-rej { border-left-color: var(--danger); opacity: 0.6; }
+        .row-item:hover { border-color: #cbd5e1; }
+        .row-item.status-app { border-left: 3px solid var(--success); }
+        .row-item.status-rej { border-left: 3px solid var(--danger); opacity: 0.5; }
 
-        /* Col 1: Formando */
-        .col-u { display: flex; flex-direction: column; gap: 4px; }
-        .u-name { font-weight: 700; font-size: 13.5px; color: var(--text-main); }
-        .u-time { font-size: 11px; color: var(--text-muted); }
-        .u-forum { font-size: 10.5px; font-weight: 700; color: var(--primary); background: var(--primary-soft); padding: 2px 6px; border-radius: 4px; width: fit-content; margin-top: 2px; }
-        .u-link { font-size: 11px; color: var(--primary); text-decoration: none; font-weight: 600; margin-top: 4px; display: inline-flex; align-items: center; gap: 3px; }
+        /* Col 1: Formando (Simples e Elegante) */
+        .col-u { display: flex; flex-direction: column; gap: 2px; }
+        .u-name { font-weight: 600; font-size: 13px; color: var(--text-main); }
+        .u-meta { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; margin-top: 1px; flex-wrap: wrap; }
+        .u-link { color: var(--primary); text-decoration: none; }
         .u-link:hover { text-decoration: underline; }
-        .validador-tag { font-size: 10.5px; color: #047857; background: #ecfdf5; padding: 2px 6px; border-radius: 4px; font-weight: 600; margin-top: 4px; width: fit-content; }
+        .u-val { font-size: 11px; color: var(--success); font-weight: 500; margin-top: 3px; }
 
-        /* Col 2: Post Original */
-        .col-p { display: flex; flex-direction: column; gap: 4px; }
-        .p-text {
-            font-size: 12.5px; line-height: 1.5; color: #334155;
-            background: #f8fafc; border-radius: 8px; padding: 8px 12px;
-            white-space: pre-wrap; word-break: break-word; max-height: 130px; overflow-y: auto;
-            border: 1px solid #f1f5f9;
-        }
+        /* Col 2: Dúvida */
+        .col-p { font-size: 12.5px; line-height: 1.45; color: var(--text-main); white-space: pre-wrap; word-break: break-word; max-height: 120px; overflow-y: auto; padding-right: 4px; }
 
-        /* Col 3: Resposta Editável + Linter */
-        .col-r { display: flex; flex-direction: column; gap: 6px; }
-        .r-header { display: flex; justify-content: space-between; align-items: center; font-size: 11px; }
-        .linter-badges { display: flex; gap: 4px; align-items: center; }
-        .linter-badge { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
-        .badge-ok { background: #dcfce7; color: #15803d; }
-        .badge-warn { background: #fee2e2; color: #b91c1c; }
-
+        /* Col 3: Resposta Editável */
+        .col-r { display: flex; flex-direction: column; }
         .r-area {
-            width: 100%; min-height: 95px; height: 95px; padding: 8px 12px;
-            border: 1px solid var(--border); border-radius: 8px;
-            font-size: 12px; line-height: 1.45; color: var(--text-main);
-            font-family: inherit; resize: vertical; outline: none;
-            transition: all 0.15s; background: #ffffff;
+            width: 100%; min-height: 85px; height: 85px; padding: 6px 8px;
+            border: 1px solid var(--border); border-radius: 4px;
+            font-size: 12px; line-height: 1.4; color: var(--text-main);
+            font-family: inherit; resize: vertical; outline: none; background: #ffffff;
         }
-        .r-area:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(22,112,204,0.1); }
+        .r-area:focus { border-color: var(--primary); }
 
-        /* Col 4: Ações Rápidas */
-        .col-a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
-        .btn-circle {
-            width: 32px; height: 32px; border-radius: 50%;
+        /* Col 4: Ações */
+        .col-a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+        .btn-action {
+            width: 28px; height: 28px; border-radius: 4px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 14px; font-weight: 700; border: 1px solid var(--border);
-            background: #fff; cursor: pointer; transition: all 0.15s;
+            font-size: 13px; font-weight: 700; border: 1px solid var(--border);
+            background: #fff; cursor: pointer; color: var(--text-muted);
         }
-        .btn-circle:hover { transform: scale(1.1); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .btn-v { color: var(--success); }
-        .btn-v.active { background: var(--success); color: #fff; border-color: var(--success); }
-        .btn-x { color: var(--danger); }
-        .btn-x.active { background: var(--danger); color: #fff; border-color: var(--danger); }
-        .check-lbl { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text-muted); cursor: pointer; }
-        .check-lbl input { width: 15px; height: 15px; accent-color: var(--primary); cursor: pointer; }
+        .btn-action:hover { background: #f3f4f6; }
+        .btn-action.btn-v.active { background: var(--success); color: #fff; border-color: var(--success); }
+        .btn-action.btn-x.active { background: var(--danger); color: #fff; border-color: var(--danger); }
+        .chk-item { width: 14px; height: 14px; cursor: pointer; margin-top: 2px; }
 
-        /* Sticky Footer */
+        /* Rodapé Fixo Minimalista */
         .footer-bar {
             position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
             background: #ffffff; border-top: 1px solid var(--border);
-            padding: 10px 24px; display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.03);
+            padding: 8px 24px; display: flex; justify-content: space-between; align-items: center;
         }
-        .footer-txt { font-size: 13px; font-weight: 600; color: #334155; }
+        .footer-txt { font-size: 12px; color: var(--text-muted); font-weight: 500; }
 
-        /* Toast notification */
+        /* Toast Discreto */
         #toast {
-            position: fixed; bottom: 70px; right: 24px; z-index: 100;
-            background: #0f172a; color: #fff; padding: 10px 18px; border-radius: 8px;
-            font-size: 12.5px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            display: none; align-items: center; gap: 8px; transition: all 0.2s;
+            position: fixed; bottom: 60px; right: 20px; z-index: 100;
+            background: #1f2937; color: #fff; padding: 8px 14px; border-radius: 6px;
+            font-size: 12px; display: none; align-items: center; gap: 6px;
         }
     </style>
 </head>
@@ -181,73 +145,64 @@
 
     <div id="toast"></div>
 
-    <!-- Top Header -->
+    <!-- Barra Superior -->
     <header>
         <div class="header-left">
-            <span class="cml-badge">CML</span>
-            <div>
-                <span class="header-title">Moderação Pedagógica de Fóruns</span>
-                <span class="header-subtitle"> • Teams & SharePoint</span>
-            </div>
+            <span class="header-title">Moderação de Fóruns</span>
+            <span class="header-subtitle">Teams & SharePoint</span>
         </div>
         <div class="header-right">
-            <!-- Selector de Formador Ativo -->
-            <div class="user-pill">
-                <span>👤 Formador(a):</span>
+            <div class="user-select-wrap">
+                <span>Formador:</span>
                 <select id="userSelector" class="user-select" onchange="onUserChange(this.value)">
                     <option value="Vanessa">Vanessa</option>
                     <option value="Hélder Toucas">Hélder Toucas</option>
                 </select>
             </div>
-
-            <div class="header-stats">
-                <span class="stat stat-tot" id="statTot">Total: 0</span>
-                <span class="stat stat-pen" id="statPen">Pendentes: 0</span>
-                <span class="stat stat-app" id="statApp">Validados: 0</span>
-            </div>
+            <div class="header-stats" id="statSummary">0 / 0 validados</div>
         </div>
     </header>
 
-    <!-- Toolbar -->
+    <!-- Barra de Ferramentas -->
     <div class="toolbar">
         <div class="filter-group">
-            <input type="text" id="searchInp" class="search-bar" placeholder="Pesquisar formando ou dúvida..." oninput="onFilter()">
+            <input type="text" id="searchInp" class="search-bar" placeholder="Pesquisar..." oninput="onFilter()">
             <select id="aulaFilter" class="select-filter" onchange="onFilter()">
                 <option value="">Todas as Aulas</option>
             </select>
             <select id="statusFilter" class="select-filter" onchange="onFilter()">
                 <option value="">Todos os Estados</option>
-                <option value="PENDING">Apenas Pendentes</option>
-                <option value="APPROVED">Apenas Validados</option>
-                <option value="REJECTED">Apenas Rejeitados</option>
+                <option value="PENDING">Pendentes</option>
+                <option value="APPROVED">Validados</option>
+                <option value="REJECTED">Rejeitados</option>
             </select>
         </div>
         <div class="btn-group">
-            <button class="btn-ghost" onclick="selectAll(true)">☑️ Selecionar Todos</button>
-            <button class="btn-ghost" onclick="selectAll(false)">◻️ Desmarcar</button>
-            <button class="btn-success" onclick="approveSelected()">⚡ Validar Selecionados</button>
-            <button class="btn-github" onclick="syncWithGitHub()">☁️ Gravar no GitHub</button>
+            <button class="btn-icon" onclick="selectAll(true)" title="Selecionar Todos">☑️</button>
+            <button class="btn-icon" onclick="selectAll(false)" title="Desmarcar Todos">◻️</button>
+            <button class="btn-icon" onclick="approveSelected()" title="Validar Selecionados">⚡ Validar</button>
+            <button class="btn-main" onclick="syncWithGitHub()">Gravar no GitHub</button>
         </div>
     </div>
 
-    <!-- Main Table Container -->
+    <!-- Lista de Posts -->
     <div class="table-container">
         <div class="table-header">
-            <div>Formando / Fórum</div>
-            <div>Dúvida do Formando</div>
-            <div>Resposta do Tutor (Editável com Linter)</div>
+            <div>Formando</div>
+            <div>Dúvida</div>
+            <div>Resposta</div>
             <div style="text-align: center;">Ações</div>
         </div>
         <div id="rowsContainer"></div>
     </div>
 
-    <!-- Footer Bar -->
+    <!-- Rodapé -->
     <div class="footer-bar">
-        <div class="footer-txt" id="footerTxt">0 de 0 respostas validadas</div>
-        <div style="display: flex; gap: 8px;">
-            <button class="btn-ghost" onclick="resetAll()">↺ Restaurar Sugestões</button>
-            <button class="btn-primary" style="padding: 8px 18px; font-size: 13px;" onclick="exportLocalJson()">💾 Descarregar JSON</button>
-            <button class="btn-success" style="padding: 8px 18px; font-size: 13px;" onclick="syncWithGitHub()">☁️ Gravar & Sincronizar GitHub</button>
+        <div class="footer-txt" id="footerTxt">0 respostas validadas</div>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <button class="btn-icon" onclick="resetAll()" title="Restaurar sugestões originais da IA">↺</button>
+            <button class="btn-icon" onclick="exportLocalJson()" title="Descarregar ficheiro JSON">💾</button>
+            <button class="btn-main" onclick="syncWithGitHub()">Gravar no GitHub</button>
         </div>
     </div>
 
@@ -261,23 +216,18 @@
             path: 'moderacao/data/moderacao.json'
         };
 
-        // Linter Andragógico da CML
-        function lintPedagogico(text) {
-            const lower = text.toLowerCase();
-            const informalRegex = /\b(tu\b|tens\b|fazes\b|vais\b|estás\b|queres\b|sabes\b|achas\b|contigo\b|teu\b|tua\b)/i;
-            const hasInformal = informalRegex.test(lower);
-            const hasGreeting = /olá|bom dia|boa tarde|votos de/i.test(lower);
-            const hasQuestion = /\?/.test(text);
-
-            return {
-                formal: !hasInformal,
-                greeting: hasGreeting,
-                question: hasQuestion
-            };
+        function formatShortDate(str) {
+            if (!str) return '';
+            // Extrai formato curto se possível (ex: "23 set, 11:02")
+            const m = str.match(/(\d{1,2})\s+de\s+([a-z]+)[^0-9]*(\d{1,2}:\d{2})/i);
+            if (m) {
+                const mes = m[2].substring(0, 3);
+                return `${m[1]} ${mes}, ${m[3]}`;
+            }
+            return str.replace('quarta-feira, ', '').replace(' de 2026', '');
         }
 
         async function init() {
-            // Verificar credenciais e token via URL (Magic Link)
             const urlParams = new URLSearchParams(window.location.search);
             const paramToken = urlParams.get('token') || urlParams.get('key');
             const paramUser = urlParams.get('user');
@@ -293,7 +243,7 @@
 
             if (paramToken || paramUser) {
                 window.history.replaceState({}, document.title, window.location.pathname);
-                showToast(`👋 Bem-vinda, ${CONFIG.validatorName}! Modo de moderação ativo.`);
+                showToast(`Formador ativo: ${CONFIG.validatorName}`);
             }
 
             const userSel = document.getElementById('userSelector');
@@ -307,7 +257,8 @@
         function onUserChange(name) {
             CONFIG.validatorName = name;
             localStorage.setItem('cml_validator_name', name);
-            showToast(`Formador ativo: ${name}`);
+            showToast(`Formador: ${name}`);
+            render();
         }
 
         async function loadData() {
@@ -317,13 +268,18 @@
                     posts = await res.json();
                     return;
                 }
-            } catch (e) {
-                console.log('Tentativa de carregamento local');
-            }
+            } catch (e) {}
+
+            try {
+                const resFallback = await fetch('forum_posts_pendentes.json?t=' + Date.now());
+                if (resFallback.ok) {
+                    posts = await resFallback.json();
+                }
+            } catch (err) {}
         }
 
         function populateAulaFilter() {
-            const aulas = [...new Set(posts.map(p => p.aula_num || 'Geral'))].sort();
+            const aulas = [...new Set(posts.map(p => p.aula_num || '1.1'))].sort();
             const sel = document.getElementById('aulaFilter');
             sel.innerHTML = '<option value="">Todas as Aulas</option>';
             aulas.forEach(a => {
@@ -351,47 +307,37 @@
 
             let html = '';
             filtered.forEach(p => {
-                const statusCls = p.moderation_status === 'APPROVED' ? 'status-app' : (p.moderation_status === 'REJECTED' ? 'status-rej' : 'status-pen');
+                const statusCls = p.moderation_status === 'APPROVED' ? 'status-app' : (p.moderation_status === 'REJECTED' ? 'status-rej' : '');
                 const replyText = p.final_reply !== undefined ? p.final_reply : p.suggested_reply;
-                const lint = lintPedagogico(replyText);
+                const shortDate = formatShortDate(p.posted_at);
 
                 html += `
-                <div class="row-item ${statusCls}" id="row-${p.idempotency_key}">
+                <div class="row-item ${statusCls}">
                     <div class="col-u">
                         <div class="u-name">${escapeHtml(p.student_name)}</div>
-                        <div class="u-time">${escapeHtml(p.posted_at || '')}</div>
-                        <div class="u-forum">Aula ${escapeHtml(p.aula_num || '1.1')} • ${escapeHtml(p.topic_title || 'Fórum')}</div>
-                        ${p.discussion_url ? `<a href="${p.discussion_url}" target="_blank" class="u-link">Abrir no Moodle ↗</a>` : ''}
-                        ${p.validator_name ? `<span class="validador-tag">✓ Validado por ${escapeHtml(p.validator_name)}</span>` : ''}
-                    </div>
-                    <div class="col-p">
-                        <div class="p-text">${escapeHtml(p.student_text)}</div>
-                    </div>
-                    <div class="col-r">
-                        <div class="r-header">
-                            <span style="font-weight: 700; color: var(--text-muted);">Sugestão Pedagógica</span>
-                            <div class="linter-badges">
-                                <span class="linter-badge ${lint.formal ? 'badge-ok' : 'badge-warn'}">${lint.formal ? '✓ Tratamento "Você"' : '⚠️ Evitar "Tu"'}</span>
-                                <span class="linter-badge ${lint.greeting ? 'badge-ok' : 'badge-warn'}">${lint.greeting ? '✓ Saudação' : '⚠️ Sem Saudação'}</span>
-                                <span class="linter-badge ${lint.question ? 'badge-ok' : 'badge-warn'}">${lint.question ? '✓ Pergunta Final' : '⚠️ Falta Pergunta'}</span>
-                            </div>
+                        <div class="u-meta">
+                            <span>Aula ${escapeHtml(p.aula_num || '1.1')}</span>
+                            <span>•</span>
+                            <span>${escapeHtml(shortDate)}</span>
+                            ${p.discussion_url ? `<span>•</span> <a href="${p.discussion_url}" target="_blank" class="u-link">Moodle ↗</a>` : ''}
                         </div>
+                        ${p.validator_name ? `<div class="u-val">✓ Validado por ${escapeHtml(p.validator_name)}</div>` : ''}
+                    </div>
+                    <div class="col-p">${escapeHtml(p.student_text)}</div>
+                    <div class="col-r">
                         <textarea class="r-area" oninput="onEditReply('${p.idempotency_key}', this.value)">${escapeHtml(replyText)}</textarea>
                     </div>
                     <div class="col-a">
                         <div style="display: flex; gap: 4px;">
-                            <button class="btn-circle btn-v ${p.moderation_status === 'APPROVED' ? 'active' : ''}" title="Aprovar" onclick="setPostStatus('${p.idempotency_key}', 'APPROVED')">✓</button>
-                            <button class="btn-circle btn-x ${p.moderation_status === 'REJECTED' ? 'active' : ''}" title="Rejeitar" onclick="setPostStatus('${p.idempotency_key}', 'REJECTED')">✕</button>
+                            <button class="btn-action btn-v ${p.moderation_status === 'APPROVED' ? 'active' : ''}" title="Aprovar" onclick="setPostStatus('${p.idempotency_key}', 'APPROVED')">✓</button>
+                            <button class="btn-action btn-x ${p.moderation_status === 'REJECTED' ? 'active' : ''}" title="Rejeitar" onclick="setPostStatus('${p.idempotency_key}', 'REJECTED')">✕</button>
                         </div>
-                        <label class="check-lbl">
-                            <input type="checkbox" class="row-chk" data-key="${p.idempotency_key}">
-                            <span>Sel.</span>
-                        </label>
+                        <input type="checkbox" class="chk-item" data-key="${p.idempotency_key}">
                     </div>
                 </div>`;
             });
 
-            container.innerHTML = html || '<div style="text-align: center; padding: 40px; color: var(--text-muted);">Nenhuma dúvida encontrada com os filtros selecionados.</div>';
+            container.innerHTML = html || '<div style="text-align: center; padding: 40px; color: var(--text-muted);">Nenhuma dúvida encontrada.</div>';
             updateStats();
         }
 
@@ -400,18 +346,6 @@
             if (p) {
                 p.final_reply = val;
                 p.is_edited = true;
-                const row = document.getElementById(`row-${key}`);
-                if (row) {
-                    const lint = lintPedagogico(val);
-                    const badges = row.querySelector('.linter-badges');
-                    if (badges) {
-                        badges.innerHTML = `
-                            <span class="linter-badge ${lint.formal ? 'badge-ok' : 'badge-warn'}">${lint.formal ? '✓ Tratamento "Você"' : '⚠️ Evitar "Tu"'}</span>
-                            <span class="linter-badge ${lint.greeting ? 'badge-ok' : 'badge-warn'}">${lint.greeting ? '✓ Saudação' : '⚠️ Sem Saudação'}</span>
-                            <span class="linter-badge ${lint.question ? 'badge-ok' : 'badge-warn'}">${lint.question ? '✓ Pergunta Final' : '⚠️ Falta Pergunta'}</span>
-                        `;
-                    }
-                }
             }
         }
 
@@ -431,13 +365,13 @@
         }
 
         function selectAll(val) {
-            document.querySelectorAll('.row-chk').forEach(c => c.checked = val);
+            document.querySelectorAll('.chk-item').forEach(c => c.checked = val);
         }
 
         function approveSelected() {
-            const chks = document.querySelectorAll('.row-chk:checked');
+            const chks = document.querySelectorAll('.chk-item:checked');
             if (!chks.length) {
-                alert('Selecione pelo menos uma mensagem com a caixa de seleção.');
+                alert('Selecione pelo menos uma linha.');
                 return;
             }
             chks.forEach(c => {
@@ -450,11 +384,11 @@
                 }
             });
             render();
-            showToast(`Aprovadas ${chks.length} respostas por ${CONFIG.validatorName}`);
+            showToast(`${chks.length} validados por ${CONFIG.validatorName}`);
         }
 
         function resetAll() {
-            if (!confirm('Deseja restaurar todos os textos para as sugestões originais geradas pela IA?')) return;
+            if (!confirm('Restaurar todas as sugestões originais?')) return;
             posts.forEach(p => {
                 p.final_reply = p.suggested_reply;
                 p.is_edited = false;
@@ -465,11 +399,7 @@
         function updateStats() {
             const tot = posts.length;
             const app = posts.filter(p => p.moderation_status === 'APPROVED').length;
-            const pen = posts.filter(p => p.moderation_status === 'PENDING').length;
-
-            document.getElementById('statTot').innerText = `Total: ${tot}`;
-            document.getElementById('statPen').innerText = `Pendentes: ${pen}`;
-            document.getElementById('statApp').innerText = `Validados: ${app}`;
+            document.getElementById('statSummary').innerText = `${app} de ${tot} validados`;
             document.getElementById('footerTxt').innerText = `${app} de ${tot} respostas validadas para publicação`;
         }
 
@@ -477,15 +407,14 @@
             render();
         }
 
-        // Sincronização direta com GitHub
         async function syncWithGitHub() {
             if (!CONFIG.githubToken) {
-                alert('O token de sincronização não está configurado.');
+                alert('Token de acesso não configurado.');
                 return;
             }
 
-            const btn = event?.target;
-            if (btn) btn.innerText = 'A gravar... ⏳';
+            const btns = document.querySelectorAll('.btn-main');
+            btns.forEach(b => b.innerText = 'A gravar...');
 
             try {
                 const getUrl = `https://api.github.com/repos/${CONFIG.repo}/contents/${CONFIG.path}`;
@@ -514,22 +443,19 @@
                         'Accept': 'application/vnd.github.v3+json'
                     },
                     body: JSON.stringify({
-                        message: `docs(forum): validacao por ${validador} via GitHub Pages`,
+                        message: `docs(forum): validacao por ${validador}`,
                         content: base64Content,
                         sha: sha || undefined
                     })
                 });
 
-                if (!putRes.ok) {
-                    const err = await putRes.json();
-                    throw new Error(err.message || 'Erro ao gravar no GitHub');
-                }
+                if (!putRes.ok) throw new Error('Erro ao gravar');
 
-                showToast(`🎉 Respostas gravadas com sucesso no GitHub por ${validador}!`);
+                showToast(`Gravado no GitHub com sucesso (${validador})`);
             } catch (err) {
-                alert(`❌ Erro ao sincronizar com GitHub: ${err.message}\n\nPode usar o botão "Descarregar JSON" como alternativa.`);
+                alert(`Erro ao sincronizar: ${err.message}`);
             } finally {
-                if (btn) btn.innerText = '☁️ Gravar & Sincronizar GitHub';
+                btns.forEach(b => b.innerText = 'Gravar no GitHub');
             }
         }
 
@@ -547,7 +473,7 @@
             const t = document.getElementById('toast');
             t.innerText = msg;
             t.style.display = 'flex';
-            setTimeout(() => { t.style.display = 'none'; }, 3500);
+            setTimeout(() => { t.style.display = 'none'; }, 2500);
         }
 
         function escapeHtml(str) {
