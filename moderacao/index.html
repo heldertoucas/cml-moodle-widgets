@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moderação de Fóruns — Futuro Digital CML</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1670cc;
+            --primary-hover: #12569e;
+            --primary-soft: #eff6ff;
+            --success: #059669;
+            --success-soft: #ecfdf5;
+            --danger: #dc2626;
+            --danger-soft: #fef2f2;
+            --warning: #d97706;
+            --warning-soft: #fffbeb;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Plus Jakarta Sans", sans-serif; }
+        body { background: var(--bg); color: var(--text-main); padding-bottom: 85px; font-size: 13px; -webkit-font-smoothing: antialiased; }
+
+        /* Header */
+        header {
+            position: sticky; top: 0; z-index: 50;
+            background: #ffffff; border-bottom: 1px solid var(--border);
+            padding: 10px 24px; display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .cml-badge { background: var(--primary); color: #fff; padding: 3px 8px; border-radius: 6px; font-weight: 700; font-size: 11px; letter-spacing: 0.5px; }
+        .header-title { font-size: 15px; font-weight: 700; color: var(--text-main); }
+        .header-subtitle { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+
+        .header-right { display: flex; align-items: center; gap: 12px; }
+        .header-stats { display: flex; gap: 6px; align-items: center; font-size: 11.5px; font-weight: 600; }
+        .stat { padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 4px; }
+        .stat-tot { background: #f1f5f9; color: var(--text-muted); }
+        .stat-pen { background: var(--warning-soft); color: var(--warning); border: 1px solid #fde68a; }
+        .stat-app { background: var(--success-soft); color: var(--success); border: 1px solid #a7f3d0; }
+
+        /* User Profile Pill */
+        .user-pill {
+            display: flex; align-items: center; gap: 6px;
+            background: #f1f5f9; border: 1px solid var(--border);
+            padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;
+        }
+        .user-select {
+            border: none; background: transparent; font-size: 12px; font-weight: 700;
+            color: var(--primary); cursor: pointer; outline: none;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            max-width: 1600px; margin: 14px auto; padding: 0 20px;
+            display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+        }
+        .filter-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .search-bar { width: 260px; padding: 7px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 12.5px; outline: none; background: #fff; }
+        .search-bar:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(22,112,204,0.1); }
+        .select-filter { padding: 7px 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 12.5px; outline: none; background: #fff; color: var(--text-main); cursor: pointer; }
+
+        .btn-group { display: flex; gap: 8px; align-items: center; }
+        button { cursor: pointer; border: none; border-radius: 8px; font-weight: 600; font-size: 12px; padding: 7px 14px; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-ghost { background: #fff; border: 1px solid var(--border); color: var(--text-main); }
+        .btn-ghost:hover { background: #f1f5f9; border-color: #cbd5e1; }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-success { background: var(--success); color: #fff; }
+        .btn-success:hover { background: #047857; }
+        .btn-github { background: #24292f; color: #fff; }
+        .btn-github:hover { background: #1b1f23; }
+
+        /* Table Grid */
+        .table-container { max-width: 1600px; margin: 0 auto; padding: 0 20px; }
+        .table-header {
+            display: grid;
+            grid-template-columns: 200px 1.1fr 1.6fr 90px;
+            gap: 16px; padding: 8px 16px;
+            font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+            color: var(--text-muted);
+        }
+
+        .row-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            display: grid;
+            grid-template-columns: 200px 1.1fr 1.6fr 90px;
+            gap: 16px;
+            align-items: start;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+            transition: all 0.15s;
+            border-left: 4px solid #cbd5e1;
+        }
+        .row-item:hover { box-shadow: 0 3px 10px rgba(0,0,0,0.04); border-color: #cbd5e1; }
+        .row-item.status-app { border-left-color: var(--success); }
+        .row-item.status-pen { border-left-color: var(--warning); }
+        .row-item.status-rej { border-left-color: var(--danger); opacity: 0.6; }
+
+        /* Col 1: Formando */
+        .col-u { display: flex; flex-direction: column; gap: 4px; }
+        .u-name { font-weight: 700; font-size: 13.5px; color: var(--text-main); }
+        .u-time { font-size: 11px; color: var(--text-muted); }
+        .u-forum { font-size: 10.5px; font-weight: 700; color: var(--primary); background: var(--primary-soft); padding: 2px 6px; border-radius: 4px; width: fit-content; margin-top: 2px; }
+        .u-link { font-size: 11px; color: var(--primary); text-decoration: none; font-weight: 600; margin-top: 4px; display: inline-flex; align-items: center; gap: 3px; }
+        .u-link:hover { text-decoration: underline; }
+        .validador-tag { font-size: 10.5px; color: #047857; background: #ecfdf5; padding: 2px 6px; border-radius: 4px; font-weight: 600; margin-top: 4px; width: fit-content; }
+
+        /* Col 2: Post Original */
+        .col-p { display: flex; flex-direction: column; gap: 4px; }
+        .p-text {
+            font-size: 12.5px; line-height: 1.5; color: #334155;
+            background: #f8fafc; border-radius: 8px; padding: 8px 12px;
+            white-space: pre-wrap; word-break: break-word; max-height: 130px; overflow-y: auto;
+            border: 1px solid #f1f5f9;
+        }
+
+        /* Col 3: Resposta Editável + Linter */
+        .col-r { display: flex; flex-direction: column; gap: 6px; }
+        .r-header { display: flex; justify-content: space-between; align-items: center; font-size: 11px; }
+        .linter-badges { display: flex; gap: 4px; align-items: center; }
+        .linter-badge { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
+        .badge-ok { background: #dcfce7; color: #15803d; }
+        .badge-warn { background: #fee2e2; color: #b91c1c; }
+
+        .r-area {
+            width: 100%; min-height: 95px; height: 95px; padding: 8px 12px;
+            border: 1px solid var(--border); border-radius: 8px;
+            font-size: 12px; line-height: 1.45; color: var(--text-main);
+            font-family: inherit; resize: vertical; outline: none;
+            transition: all 0.15s; background: #ffffff;
+        }
+        .r-area:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(22,112,204,0.1); }
+
+        /* Col 4: Ações Rápidas */
+        .col-a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
+        .btn-circle {
+            width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; font-weight: 700; border: 1px solid var(--border);
+            background: #fff; cursor: pointer; transition: all 0.15s;
+        }
+        .btn-circle:hover { transform: scale(1.1); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .btn-v { color: var(--success); }
+        .btn-v.active { background: var(--success); color: #fff; border-color: var(--success); }
+        .btn-x { color: var(--danger); }
+        .btn-x.active { background: var(--danger); color: #fff; border-color: var(--danger); }
+        .check-lbl { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text-muted); cursor: pointer; }
+        .check-lbl input { width: 15px; height: 15px; accent-color: var(--primary); cursor: pointer; }
+
+        /* Sticky Footer */
+        .footer-bar {
+            position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+            background: #ffffff; border-top: 1px solid var(--border);
+            padding: 10px 24px; display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.03);
+        }
+        .footer-txt { font-size: 13px; font-weight: 600; color: #334155; }
+
+        /* Toast notification */
+        #toast {
+            position: fixed; bottom: 70px; right: 24px; z-index: 100;
+            background: #0f172a; color: #fff; padding: 10px 18px; border-radius: 8px;
+            font-size: 12.5px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none; align-items: center; gap: 8px; transition: all 0.2s;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="toast"></div>
+
+    <!-- Top Header -->
+    <header>
+        <div class="header-left">
+            <span class="cml-badge">CML</span>
+            <div>
+                <span class="header-title">Moderação Pedagógica de Fóruns</span>
+                <span class="header-subtitle"> • Teams & SharePoint</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <!-- Selector de Formador Ativo -->
+            <div class="user-pill">
+                <span>👤 Formador(a):</span>
+                <select id="userSelector" class="user-select" onchange="onUserChange(this.value)">
+                    <option value="Vanessa">Vanessa</option>
+                    <option value="Hélder Toucas">Hélder Toucas</option>
+                </select>
+            </div>
+
+            <div class="header-stats">
+                <span class="stat stat-tot" id="statTot">Total: 0</span>
+                <span class="stat stat-pen" id="statPen">Pendentes: 0</span>
+                <span class="stat stat-app" id="statApp">Validados: 0</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+        <div class="filter-group">
+            <input type="text" id="searchInp" class="search-bar" placeholder="Pesquisar formando ou dúvida..." oninput="onFilter()">
+            <select id="aulaFilter" class="select-filter" onchange="onFilter()">
+                <option value="">Todas as Aulas</option>
+            </select>
+            <select id="statusFilter" class="select-filter" onchange="onFilter()">
+                <option value="">Todos os Estados</option>
+                <option value="PENDING">Apenas Pendentes</option>
+                <option value="APPROVED">Apenas Validados</option>
+                <option value="REJECTED">Apenas Rejeitados</option>
+            </select>
+        </div>
+        <div class="btn-group">
+            <button class="btn-ghost" onclick="selectAll(true)">☑️ Selecionar Todos</button>
+            <button class="btn-ghost" onclick="selectAll(false)">◻️ Desmarcar</button>
+            <button class="btn-success" onclick="approveSelected()">⚡ Validar Selecionados</button>
+            <button class="btn-github" onclick="syncWithGitHub()">☁️ Gravar no GitHub</button>
+        </div>
+    </div>
+
+    <!-- Main Table Container -->
+    <div class="table-container">
+        <div class="table-header">
+            <div>Formando / Fórum</div>
+            <div>Dúvida do Formando</div>
+            <div>Resposta do Tutor (Editável com Linter)</div>
+            <div style="text-align: center;">Ações</div>
+        </div>
+        <div id="rowsContainer"></div>
+    </div>
+
+    <!-- Footer Bar -->
+    <div class="footer-bar">
+        <div class="footer-txt" id="footerTxt">0 de 0 respostas validadas</div>
+        <div style="display: flex; gap: 8px;">
+            <button class="btn-ghost" onclick="resetAll()">↺ Restaurar Sugestões</button>
+            <button class="btn-primary" style="padding: 8px 18px; font-size: 13px;" onclick="exportLocalJson()">💾 Descarregar JSON</button>
+            <button class="btn-success" style="padding: 8px 18px; font-size: 13px;" onclick="syncWithGitHub()">☁️ Gravar & Sincronizar GitHub</button>
+        </div>
+    </div>
+
+    <script>
+        let posts = [];
+
+        const CONFIG = {
+            validatorName: localStorage.getItem('cml_validator_name') || 'Vanessa',
+            githubToken: localStorage.getItem('cml_github_token') || '',
+            repo: 'heldertoucas/cml-moodle-widgets',
+            path: 'moderacao/data/moderacao.json'
+        };
+
+        // Linter Andragógico da CML
+        function lintPedagogico(text) {
+            const lower = text.toLowerCase();
+            const informalRegex = /\b(tu\b|tens\b|fazes\b|vais\b|estás\b|queres\b|sabes\b|achas\b|contigo\b|teu\b|tua\b)/i;
+            const hasInformal = informalRegex.test(lower);
+            const hasGreeting = /olá|bom dia|boa tarde|votos de/i.test(lower);
+            const hasQuestion = /\?/.test(text);
+
+            return {
+                formal: !hasInformal,
+                greeting: hasGreeting,
+                question: hasQuestion
+            };
+        }
+
+        async function init() {
+            // Verificar credenciais e token via URL (Magic Link)
+            const urlParams = new URLSearchParams(window.location.search);
+            const paramToken = urlParams.get('token') || urlParams.get('key');
+            const paramUser = urlParams.get('user');
+
+            if (paramToken) {
+                CONFIG.githubToken = paramToken;
+                localStorage.setItem('cml_github_token', paramToken);
+            }
+            if (paramUser) {
+                CONFIG.validatorName = paramUser;
+                localStorage.setItem('cml_validator_name', paramUser);
+            }
+
+            if (paramToken || paramUser) {
+                window.history.replaceState({}, document.title, window.location.pathname);
+                showToast(`👋 Bem-vinda, ${CONFIG.validatorName}! Modo de moderação ativo.`);
+            }
+
+            const userSel = document.getElementById('userSelector');
+            if (userSel) userSel.value = CONFIG.validatorName;
+
+            await loadData();
+            populateAulaFilter();
+            render();
+        }
+
+        function onUserChange(name) {
+            CONFIG.validatorName = name;
+            localStorage.setItem('cml_validator_name', name);
+            showToast(`Formador ativo: ${name}`);
+        }
+
+        async function loadData() {
+            try {
+                const res = await fetch('data/moderacao.json?t=' + Date.now());
+                if (res.ok) {
+                    posts = await res.json();
+                    return;
+                }
+            } catch (e) {
+                console.log('Tentativa de carregamento local');
+            }
+        }
+
+        function populateAulaFilter() {
+            const aulas = [...new Set(posts.map(p => p.aula_num || 'Geral'))].sort();
+            const sel = document.getElementById('aulaFilter');
+            sel.innerHTML = '<option value="">Todas as Aulas</option>';
+            aulas.forEach(a => {
+                sel.innerHTML += `<option value="${a}">Aula ${a}</option>`;
+            });
+        }
+
+        function render() {
+            const container = document.getElementById('rowsContainer');
+            const search = document.getElementById('searchInp').value.toLowerCase();
+            const aula = document.getElementById('aulaFilter').value;
+            const status = document.getElementById('statusFilter').value;
+
+            let filtered = posts.filter(p => {
+                if (aula && p.aula_num !== aula) return false;
+                if (status && p.moderation_status !== status) return false;
+                if (search) {
+                    const matchName = (p.student_name || '').toLowerCase().includes(search);
+                    const matchText = (p.student_text || '').toLowerCase().includes(search);
+                    const matchReply = ((p.final_reply || p.suggested_reply) || '').toLowerCase().includes(search);
+                    if (!matchName && !matchText && !matchReply) return false;
+                }
+                return true;
+            });
+
+            let html = '';
+            filtered.forEach(p => {
+                const statusCls = p.moderation_status === 'APPROVED' ? 'status-app' : (p.moderation_status === 'REJECTED' ? 'status-rej' : 'status-pen');
+                const replyText = p.final_reply !== undefined ? p.final_reply : p.suggested_reply;
+                const lint = lintPedagogico(replyText);
+
+                html += `
+                <div class="row-item ${statusCls}" id="row-${p.idempotency_key}">
+                    <div class="col-u">
+                        <div class="u-name">${escapeHtml(p.student_name)}</div>
+                        <div class="u-time">${escapeHtml(p.posted_at || '')}</div>
+                        <div class="u-forum">Aula ${escapeHtml(p.aula_num || '1.1')} • ${escapeHtml(p.topic_title || 'Fórum')}</div>
+                        ${p.discussion_url ? `<a href="${p.discussion_url}" target="_blank" class="u-link">Abrir no Moodle ↗</a>` : ''}
+                        ${p.validator_name ? `<span class="validador-tag">✓ Validado por ${escapeHtml(p.validator_name)}</span>` : ''}
+                    </div>
+                    <div class="col-p">
+                        <div class="p-text">${escapeHtml(p.student_text)}</div>
+                    </div>
+                    <div class="col-r">
+                        <div class="r-header">
+                            <span style="font-weight: 700; color: var(--text-muted);">Sugestão Pedagógica</span>
+                            <div class="linter-badges">
+                                <span class="linter-badge ${lint.formal ? 'badge-ok' : 'badge-warn'}">${lint.formal ? '✓ Tratamento "Você"' : '⚠️ Evitar "Tu"'}</span>
+                                <span class="linter-badge ${lint.greeting ? 'badge-ok' : 'badge-warn'}">${lint.greeting ? '✓ Saudação' : '⚠️ Sem Saudação'}</span>
+                                <span class="linter-badge ${lint.question ? 'badge-ok' : 'badge-warn'}">${lint.question ? '✓ Pergunta Final' : '⚠️ Falta Pergunta'}</span>
+                            </div>
+                        </div>
+                        <textarea class="r-area" oninput="onEditReply('${p.idempotency_key}', this.value)">${escapeHtml(replyText)}</textarea>
+                    </div>
+                    <div class="col-a">
+                        <div style="display: flex; gap: 4px;">
+                            <button class="btn-circle btn-v ${p.moderation_status === 'APPROVED' ? 'active' : ''}" title="Aprovar" onclick="setPostStatus('${p.idempotency_key}', 'APPROVED')">✓</button>
+                            <button class="btn-circle btn-x ${p.moderation_status === 'REJECTED' ? 'active' : ''}" title="Rejeitar" onclick="setPostStatus('${p.idempotency_key}', 'REJECTED')">✕</button>
+                        </div>
+                        <label class="check-lbl">
+                            <input type="checkbox" class="row-chk" data-key="${p.idempotency_key}">
+                            <span>Sel.</span>
+                        </label>
+                    </div>
+                </div>`;
+            });
+
+            container.innerHTML = html || '<div style="text-align: center; padding: 40px; color: var(--text-muted);">Nenhuma dúvida encontrada com os filtros selecionados.</div>';
+            updateStats();
+        }
+
+        function onEditReply(key, val) {
+            const p = posts.find(i => i.idempotency_key === key);
+            if (p) {
+                p.final_reply = val;
+                p.is_edited = true;
+                const row = document.getElementById(`row-${key}`);
+                if (row) {
+                    const lint = lintPedagogico(val);
+                    const badges = row.querySelector('.linter-badges');
+                    if (badges) {
+                        badges.innerHTML = `
+                            <span class="linter-badge ${lint.formal ? 'badge-ok' : 'badge-warn'}">${lint.formal ? '✓ Tratamento "Você"' : '⚠️ Evitar "Tu"'}</span>
+                            <span class="linter-badge ${lint.greeting ? 'badge-ok' : 'badge-warn'}">${lint.greeting ? '✓ Saudação' : '⚠️ Sem Saudação'}</span>
+                            <span class="linter-badge ${lint.question ? 'badge-ok' : 'badge-warn'}">${lint.question ? '✓ Pergunta Final' : '⚠️ Falta Pergunta'}</span>
+                        `;
+                    }
+                }
+            }
+        }
+
+        function setPostStatus(key, status) {
+            const p = posts.find(i => i.idempotency_key === key);
+            if (p) {
+                p.moderation_status = status;
+                if (status === 'APPROVED') {
+                    p.validator_name = CONFIG.validatorName || 'Vanessa';
+                    p.validated_at = new Date().toISOString();
+                } else {
+                    p.validator_name = '';
+                    p.validated_at = '';
+                }
+                render();
+            }
+        }
+
+        function selectAll(val) {
+            document.querySelectorAll('.row-chk').forEach(c => c.checked = val);
+        }
+
+        function approveSelected() {
+            const chks = document.querySelectorAll('.row-chk:checked');
+            if (!chks.length) {
+                alert('Selecione pelo menos uma mensagem com a caixa de seleção.');
+                return;
+            }
+            chks.forEach(c => {
+                const k = c.getAttribute('data-key');
+                const p = posts.find(i => i.idempotency_key === k);
+                if (p) {
+                    p.moderation_status = 'APPROVED';
+                    p.validator_name = CONFIG.validatorName || 'Vanessa';
+                    p.validated_at = new Date().toISOString();
+                }
+            });
+            render();
+            showToast(`Aprovadas ${chks.length} respostas por ${CONFIG.validatorName}`);
+        }
+
+        function resetAll() {
+            if (!confirm('Deseja restaurar todos os textos para as sugestões originais geradas pela IA?')) return;
+            posts.forEach(p => {
+                p.final_reply = p.suggested_reply;
+                p.is_edited = false;
+            });
+            render();
+        }
+
+        function updateStats() {
+            const tot = posts.length;
+            const app = posts.filter(p => p.moderation_status === 'APPROVED').length;
+            const pen = posts.filter(p => p.moderation_status === 'PENDING').length;
+
+            document.getElementById('statTot').innerText = `Total: ${tot}`;
+            document.getElementById('statPen').innerText = `Pendentes: ${pen}`;
+            document.getElementById('statApp').innerText = `Validados: ${app}`;
+            document.getElementById('footerTxt').innerText = `${app} de ${tot} respostas validadas para publicação`;
+        }
+
+        function onFilter() {
+            render();
+        }
+
+        // Sincronização direta com GitHub
+        async function syncWithGitHub() {
+            if (!CONFIG.githubToken) {
+                alert('O token de sincronização não está configurado.');
+                return;
+            }
+
+            const btn = event?.target;
+            if (btn) btn.innerText = 'A gravar... ⏳';
+
+            try {
+                const getUrl = `https://api.github.com/repos/${CONFIG.repo}/contents/${CONFIG.path}`;
+                const getRes = await fetch(getUrl, {
+                    headers: {
+                        'Authorization': `Bearer ${CONFIG.githubToken}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+
+                let sha = null;
+                if (getRes.ok) {
+                    const data = await getRes.json();
+                    sha = data.sha;
+                }
+
+                const contentStr = JSON.stringify(posts, null, 2);
+                const base64Content = btoa(unescape(encodeURIComponent(contentStr)));
+                const validador = CONFIG.validatorName || 'Vanessa';
+
+                const putRes = await fetch(getUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${CONFIG.githubToken}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/vnd.github.v3+json'
+                    },
+                    body: JSON.stringify({
+                        message: `docs(forum): validacao por ${validador} via GitHub Pages`,
+                        content: base64Content,
+                        sha: sha || undefined
+                    })
+                });
+
+                if (!putRes.ok) {
+                    const err = await putRes.json();
+                    throw new Error(err.message || 'Erro ao gravar no GitHub');
+                }
+
+                showToast(`🎉 Respostas gravadas com sucesso no GitHub por ${validador}!`);
+            } catch (err) {
+                alert(`❌ Erro ao sincronizar com GitHub: ${err.message}\n\nPode usar o botão "Descarregar JSON" como alternativa.`);
+            } finally {
+                if (btn) btn.innerText = '☁️ Gravar & Sincronizar GitHub';
+            }
+        }
+
+        function exportLocalJson() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(posts, null, 2));
+            const dl = document.createElement('a');
+            dl.setAttribute("href", dataStr);
+            dl.setAttribute("download", "moderacao.json");
+            document.body.appendChild(dl);
+            dl.click();
+            dl.remove();
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.style.display = 'flex';
+            setTimeout(() => { t.style.display = 'none'; }, 3500);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
