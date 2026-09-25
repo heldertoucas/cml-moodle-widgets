@@ -90,6 +90,11 @@
         .row-item:hover { border-color: #cbd5e1; }
         .row-item.status-app { border-left: 3px solid var(--success); }
         .row-item.status-rej { border-left: 3px solid var(--danger); opacity: 0.5; }
+        .row-item.status-pub { border-left: 3px solid #94a3b8; opacity: 0.55; background: #f8fafc; }
+        .row-item.status-pub .r-area { background: #f1f5f9; color: #64748b; cursor: not-allowed; border-color: #cbd5e1; }
+        .row-item.status-pub .btn-action { cursor: not-allowed; opacity: 0.6; pointer-events: none; }
+        .row-item.status-pub .chk-item { cursor: not-allowed; opacity: 0.5; pointer-events: none; }
+        .badge-published { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; color: #475569; background: #e2e8f0; border-radius: 4px; padding: 2px 6px; margin-top: 4px; width: fit-content; }
 
         /* Col 1: Formando (Simples e Elegante) */
         .col-u { display: flex; flex-direction: column; gap: 2px; }
@@ -175,6 +180,7 @@
                 <option value="PENDING">Pendentes</option>
                 <option value="APPROVED">Validados</option>
                 <option value="REJECTED">Rejeitados</option>
+                <option value="PUBLISHED">Já Publicados / Respondidos</option>
             </select>
         </div>
         <div class="btn-group">
@@ -295,7 +301,11 @@
 
             let filtered = posts.filter(p => {
                 if (aula && p.aula_num !== aula) return false;
-                if (status && p.moderation_status !== status) return false;
+                if (status === 'PUBLISHED') {
+                    if (p.publication_status !== 'PUBLISHED' && p.publication_status !== 'ALREADY_ANSWERED' && !p.has_tutor_reply) return false;
+                } else if (status && p.moderation_status !== status) {
+                    return false;
+                }
                 if (search) {
                     const matchName = (p.student_name || '').toLowerCase().includes(search);
                     const matchText = (p.student_text || '').toLowerCase().includes(search);
@@ -307,7 +317,15 @@
 
             let html = '';
             filtered.forEach(p => {
-                const statusCls = p.moderation_status === 'APPROVED' ? 'status-app' : (p.moderation_status === 'REJECTED' ? 'status-rej' : '');
+                const isPublished = p.publication_status === 'PUBLISHED' || p.publication_status === 'ALREADY_ANSWERED' || p.has_tutor_reply;
+                let statusCls = '';
+                if (isPublished) {
+                    statusCls = 'status-pub';
+                } else if (p.moderation_status === 'APPROVED') {
+                    statusCls = 'status-app';
+                } else if (p.moderation_status === 'REJECTED') {
+                    statusCls = 'status-rej';
+                }
                 const replyText = p.final_reply !== undefined ? p.final_reply : p.suggested_reply;
                 const shortDate = formatShortDate(p.posted_at);
 
@@ -321,18 +339,18 @@
                             <span>${escapeHtml(shortDate)}</span>
                             ${p.discussion_url ? `<span>•</span> <a href="${p.discussion_url}" target="_blank" class="u-link">Moodle ↗</a>` : ''}
                         </div>
-                        ${p.validator_name ? `<div class="u-val">✓ Validado por ${escapeHtml(p.validator_name)}</div>` : ''}
+                        ${isPublished ? `<div class="badge-published">✓ Respondido no Moodle</div>` : (p.validator_name ? `<div class="u-val">✓ Validado por ${escapeHtml(p.validator_name)}</div>` : '')}
                     </div>
                     <div class="col-p">${escapeHtml(p.student_text)}</div>
                     <div class="col-r">
-                        <textarea class="r-area" oninput="onEditReply('${p.idempotency_key}', this.value)">${escapeHtml(replyText)}</textarea>
+                        <textarea class="r-area" ${isPublished ? 'disabled title="Esta mensagem já possui resposta no Moodle."' : ''} oninput="onEditReply('${p.idempotency_key}', this.value)">${escapeHtml(replyText)}</textarea>
                     </div>
                     <div class="col-a">
                         <div style="display: flex; gap: 4px;">
-                            <button class="btn-action btn-v ${p.moderation_status === 'APPROVED' ? 'active' : ''}" title="Aprovar" onclick="setPostStatus('${p.idempotency_key}', 'APPROVED')">✓</button>
-                            <button class="btn-action btn-x ${p.moderation_status === 'REJECTED' ? 'active' : ''}" title="Rejeitar" onclick="setPostStatus('${p.idempotency_key}', 'REJECTED')">✕</button>
+                            <button class="btn-action btn-v ${p.moderation_status === 'APPROVED' ? 'active' : ''}" ${isPublished ? 'disabled' : ''} title="Aprovar" onclick="setPostStatus('${p.idempotency_key}', 'APPROVED')">✓</button>
+                            <button class="btn-action btn-x ${p.moderation_status === 'REJECTED' ? 'active' : ''}" ${isPublished ? 'disabled' : ''} title="Rejeitar" onclick="setPostStatus('${p.idempotency_key}', 'REJECTED')">✕</button>
                         </div>
-                        <input type="checkbox" class="chk-item" data-key="${p.idempotency_key}">
+                        <input type="checkbox" class="chk-item" ${isPublished ? 'disabled' : ''} data-key="${p.idempotency_key}">
                     </div>
                 </div>`;
             });
